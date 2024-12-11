@@ -26,11 +26,16 @@ logs_db: List[Log] = []
 async def read_root(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "logs": logs_db})
 
-# Endpoint to add a log (using PUT request)
 @observice_router.post("/api/logs/")
 async def add_log(log: Log):
-    logs_db.insert(0, log)  # Add the log to the list
+    logs_db.insert(0, log)
     return {"log_name": log.name, "message": "Log added successfully"}
+
+@observice_router.delete("/api/logs/")
+async def clear_logs():
+    logs_db.clear()
+    return {"message": "All logs have been cleared successfully"}
+
 
 @observice_router.get("/api/logs/")
 def get_logs(level: Optional[str] = None, limit: int = Query(100, ge=1)):
