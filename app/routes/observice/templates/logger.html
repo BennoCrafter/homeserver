@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Logger Console</title>
+        <link
+            href="{{ url_for('observice_static', path='styles.css') }}"
+            rel="stylesheet"
+        />
+    </head>
+    <body>
+        <div class="console-container">
+            <header>
+                <h1>Logger Console</h1>
+
+                <div class="filter">
+                    <label for="log-level">Filter by Level: </label>
+                    <select id="log-level" onchange="fetchLogs()">
+                        <option value="">All</option>
+                        <hr />
+                        <option value="INFO">INFO</option>
+                        <option value="ERROR">ERROR</option>
+                        <option value="DEBUG">DEBUG</option>
+                        <option value="WARN">WARN</option>
+                    </select>
+                    <label for="log-limit">Limit: </label>
+                    <input
+                        type="number"
+                        id="log-limit"
+                        min="1"
+                        onchange="fetchLogs()"
+                        value="100"
+                    />
+                </div>
+            </header>
+
+            <div class="divider"></div>
+            <div class="console">
+                <div class="placeholder">No logs available</div>
+                <!-- Logs will be dynamically inserted here -->
+            </div>
+        </div>
+
+        <script>
+            document
+                .getElementById("log-limit")
+                .addEventListener("keydown", function (event) {
+                    if (event.key === "Enter") {
+                        this.blur();
+                    }
+                });
+
+            document
+                .getElementById("log-level")
+                .addEventListener("change", function () {
+                    this.blur(); // Remove focus from the dropdown when it loses focus
+                });
+
+            document.addEventListener("click", function (event) {
+                const dropdown = document.getElementById("log-level");
+                if (!dropdown.contains(event.target)) {
+                    dropdown.blur();
+                }
+            });
+        </script>
+
+        <script>
+            let isTabActive = true;
+            let isWindowActive = true;
+            // Function to fetch logs from the server and update the console
+            function fetchLogs(force = false) {
+                if ((!isTabActive || !isWindowActive) && !force) {
+                    return;
+                }
+                const logLevel = document.getElementById("log-level").value;
+                const logLimit = document.getElementById("log-limit").value;
+                const url = `/observice/api/logs/?limit=${logLimit}${logLevel ? `&level=${logLevel}` : ""}`;
+                fetch(url)
+                    .then((response) => response.json())
+                    .then((logs) => {
+                        const consoleElement =
+                            document.querySelector(".console");
+
+                        if (logs.length === 0) {
+                            consoleElement.innerHTML =
+                                "<div class='placeholder'>No logs available</div>";
+                            return;
+                        }
+
+                        consoleElement.innerHTML = "";
+
+                        // Append all logs to the console
+                        logs.forEach((log) => {
+                            const logEntry = document.createElement("div");
+                            logEntry.classList.add(
+                                "log-entry",
+                                log.level.toLowerCase(),
+                            );
+
+                            logEntry.innerHTML = `
+                              <span class="timestamp">${formatTimestamp(log.timestamp)}</span>
+                              <span class="name">${log.name}</span>
+                              <span class="level">${log.level}</span>
+                              <span class="message">${log.message}</span>
+                          `;
+
+                            consoleElement.appendChild(logEntry);
+                        });
+                    })
+                    .catch((error) =>
+                        console.error("Error fetching logs:", error),
+                    );
+            }
+
+            // Detect tab visibility
+            document.addEventListener("visibilitychange", () => {
+                if (document.hidden) {
+                    isTabActive = false;
+                } else {
+                    isTabActive = true;
+                    fetchLogs(true);
+                }
+            });
+
+            // Detect window focus/blur
+            window.addEventListener("focus", () => {
+                isWindowActive = true; // Window is focused
+                fetchLogs(true); // Force fetch when window becomes focused
+            });
+
+            window.addEventListener("blur", () => {
+                isWindowActive = false; // Window is blurred
+            });
+
+            setInterval(fetchLogs, 8 * 1000); // Refresh logs every 8 seconds
+
+            // Initial fetch on page load
+            fetchLogs(true);
+        </script>
+
+        <script>
+            function formatTimestamp(timestamp) {
+                // Convert to milliseconds by multiplying by 1000
+                const date = new Date(timestamp * 1000);
+
+                // Extract date components
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, "0"); // Month is 0-based
+                const day = String(date.getDate()).padStart(2, "0");
+                const hours = String(date.getHours()).padStart(2, "0");
+                const minutes = String(date.getMinutes()).padStart(2, "0");
+                const seconds = String(date.getSeconds()).padStart(2, "0");
+                const milliseconds = String(date.getMilliseconds()).padStart(
+                    3,
+                    "0",
+                );
+
+                // Return the formatted string in the desired format
+                return `${year}-${month}-${day} ${hours}:${minutes}:${seconds},${milliseconds}`;
+            }
+        </script>
+    </body>
+</html>

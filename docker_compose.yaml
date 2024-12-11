@@ -1,0 +1,8 @@
+version: "3.8"
+services:
+  homeserver:
+    image: ghcr.io/BennoCrafter/homeserver:latest
+    container_name: homeserver
+    ports:
+      - "8000:8000"
+    restart: always

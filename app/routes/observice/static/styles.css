@@ -1,0 +1,151 @@
+/* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Courier New", Courier, monospace;
+    background-color: #2d2d2d;
+    color: #e0e0e0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden; /* Remove body overflow */
+}
+
+.console-container {
+    width: 80%;
+    max-width: 1200px;
+    margin: 20px;
+    background-color: #1d1d1d;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
+    padding: 20px;
+    height: calc(100vh - 40px); /* Subtract the margin for padding */
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.console .placeholder {
+    color: #7d7d7d; /* Placeholder text color */
+    font-style: italic;
+    font-size: 1.2rem;
+    text-align: center;
+    padding: 20px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Center the placeholder text */
+    width: 100%;
+}
+
+header h1 {
+    text-align: center;
+    color: #f1f1f1;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.filter {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    gap: 15px;
+    font-size: 1rem;
+    color: #f1f1f1;
+}
+
+.filter label {
+    font-size: 1rem;
+    color: #f1f1f1;
+}
+
+.filter select,
+.filter input {
+    appearance: none; /* Remove the default dropdown arrow */
+    -webkit-appearance: none; /* Remove default on macOS */
+    -moz-appearance: none;
+
+    background-color: #333;
+    color: #e0e0e0;
+    border: 1px solid #444;
+    border-radius: 5px;
+    padding: 5px 10px;
+    font-size: 1rem;
+    width: 150px;
+}
+
+.filter select:focus,
+.filter input:focus {
+    outline: none;
+    border-color: #007bff;
+}
+
+.console {
+    overflow-y: auto;
+    flex-grow: 1; /* Ensure the console takes up available space */
+}
+
+.divider {
+    margin: 10px;
+    border-bottom: 2px solid #444;
+}
+
+.log-entry {
+    font-size: 1rem;
+    line-height: 1.6;
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+}
+
+.log-entry .timestamp {
+    color: #7d7d7d;
+    font-style: italic;
+    white-space: nowrap; /* Prevent line breaks */
+}
+
+.log-entry .name {
+    font-style: inherit;
+}
+
+.log-entry .level {
+    padding: 2px 10px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.log-entry .message {
+    flex-grow: 1;
+    white-space: normal; /* Allow wrapping */
+    word-wrap: break-word; /* Break words when necessary */
+    overflow: hidden; /* Optional: hides any overflow content */
+}
+
+/* Styling for different log levels */
+.log-entry.info .level {
+    background-color: #28a745;
+    color: white;
+}
+
+.log-entry.error .level {
+    background-color: #dc3545;
+    color: white;
+}
+
+.log-entry.debug .level {
+    background-color: #007bff;
+    color: white;
+}
+
+.log-entry.warn .level {
+    background-color: #ffc107;
+    color: black;
+}
